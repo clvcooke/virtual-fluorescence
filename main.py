@@ -18,6 +18,8 @@ def main(config):
     train_dataset, val_dataset = get_train_val_loader(config.level, config.batch_size, pin_memory=True)
     # create a model
     model = Model(1)
+    if config.use_gpu:
+        model.cuda()
     # setup optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=config.init_lr)
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
