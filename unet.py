@@ -4,10 +4,10 @@ from torch import nn as nn
 
 class UNet(nn.Module):
 
-    def __init__(self, input_shape, num_classes, start_filters, channels_in=1):
+    def __init__(self, num_classes, start_filters, channels_in=1):
         # five sets of standard conv blocks
         super().__init__()
-        self.conv1 = self.gen_conv_block(channels_in, start_filters)
+        self.conv1 = self.gen_conv_block(channels_in, start_filters, pooling=False)
         self.conv2 = self.gen_conv_block(start_filters, start_filters * 2)
         self.conv3 = self.gen_conv_block(start_filters * 2, start_filters * 4)
         self.conv4 = self.gen_conv_block(start_filters * 4, start_filters * 8)
@@ -51,13 +51,15 @@ class UNet(nn.Module):
     @staticmethod
     def gen_conv_block(channels_in, channels_out, kernel_size=3,
                        pooling=True):
-        layers = [
+        if pooling:
+            layers = [nn.MaxPool2d(kernel_size=2,stride=2)]
+        else:
+            layers = []
+        layers += [
             nn.Conv2d(channels_in, channels_out, kernel_size, padding=[1, 1]),
             nn.ReLU(),
             nn.Conv2d(channels_out, channels_out, kernel_size, padding=[1, 1]),
             nn.ReLU()]
-        if pooling:
-            layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
         return nn.Sequential(*layers)
 
     def forward(self, x):
