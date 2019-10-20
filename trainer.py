@@ -18,6 +18,7 @@ class Trainer:
         self.num_train = len(self.train_loader.sampler.indices)
         self.num_valid = len(self.val_loader.sampler.indices)
         self.lr = self.config.init_lr
+        wandb.watch(self.model)
 
     def train(self):
         print(f"\n[*] Train on {self.num_train} samples, validate on {self.num_valid} samples")
@@ -56,10 +57,13 @@ class Trainer:
                 x, y = data
                 # no memcopy
                 y = y.view(1, -1, 1, x.shape[-2], x.shape[-1]).expand(self.model.num_heads,-1, -1, -1, -1)
+                if self.config.use_gpu:
+                    x, y = x.cuda(), y.cuda()
                 output = self.model(x)
-                loss = self.criterion(output, y)
                 if training:
                     self.optimizer.zero_grad()
+                loss = self.criterion(output, y)
+                if training:
                     loss.backward()
                     self.optimizer.step()
                 try:

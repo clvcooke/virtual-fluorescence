@@ -20,6 +20,7 @@ def main(config):
     model = Model(1)
     if config.use_gpu:
         model.cuda()
+        [unet.cuda() for unet in model.unets]
     # setup optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=config.init_lr)
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
