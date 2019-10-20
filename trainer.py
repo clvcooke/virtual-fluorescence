@@ -55,7 +55,7 @@ class Trainer:
             for i, data in enumerate(dataset):
                 x, y = data
                 # no memcopy
-                y = y.view(1, -1, x.shape[0], x.shape[1]).expand(self.model.num_heads, -1, -1, -1, -1)
+                y = y.view(1, -1, x.shape[-2], x.shape[-1]).expand(self.model.num_heads, -1, -1, -1)
                 output = self.model(x)
                 loss = self.criterion(output, y)
                 if training:
