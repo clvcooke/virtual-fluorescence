@@ -4,7 +4,7 @@ from torch import nn as nn
 
 class UNet(nn.Module):
 
-    def __init__(self, num_classes, start_filters, channels_in=1):
+    def __init__(self, input_shape, num_classes, start_filters, channels_in=1):
         # five sets of standard conv blocks
         super().__init__()
         self.conv1 = self.gen_conv_block(channels_in, start_filters)
@@ -52,9 +52,9 @@ class UNet(nn.Module):
     def gen_conv_block(channels_in, channels_out, kernel_size=3,
                        pooling=True):
         layers = [
-            nn.Conv2d(channels_in, channels_out, kernel_size, padding='same'),
+            nn.Conv2d(channels_in, channels_out, kernel_size, padding=[1, 1]),
             nn.ReLU(),
-            nn.Conv2d(channels_out, channels_out, kernel_size, padding='same'),
+            nn.Conv2d(channels_out, channels_out, kernel_size, padding=[1, 1]),
             nn.ReLU()]
         if pooling:
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
