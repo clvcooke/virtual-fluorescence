@@ -23,6 +23,7 @@ class Trainer:
     def train(self):
         print(f"\n[*] Train on {self.num_train} samples, validate on {self.num_valid} samples")
         best_val_loss = np.inf
+        epochs_since_best = 0
         for epoch in range(self.config.epochs):
             print(f'\nEpoch {epoch}/{self.config.epochs} -- lr = {self.lr}')
 
@@ -32,6 +33,7 @@ class Trainer:
             is_best = val_loss < best_val_loss
             if is_best:
                 best_val_loss = val_loss
+            epochs_since_best = (epochs_since_best+1)*(1 - is_best)
             msg = f'train loss {train_loss:.3f} -- val loss {val_loss:.3f}'
             if is_best:
                 msg += ' [*]'
@@ -40,7 +42,11 @@ class Trainer:
                 'train_loss': train_loss,
                 'val_loss': val_loss
             }, step=epoch)
-            # TODO: add decay and patience
+            if epochs_since_best > self.config.lr_patience:
+                epochs_since_best = 0
+                self.lr = self.lr / np.sqrt(10)
+                for param_group in self.optimizer.param_groups:
+                    param_group['lr'] = self.lr
 
     def run_one_epoch(self, training):
         tic = time.time()

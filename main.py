@@ -15,14 +15,19 @@ def main(config):
     if config.use_gpu:
         torch.cuda.manual_seed(config.random_seed)
     # get data-loaders
-    train_dataset, val_dataset = get_train_val_loader(config.level, config.batch_size, pin_memory=True)
     # create a model
-    model = Model(1)
+    model = Model(2)
     if config.use_gpu:
         model.cuda()
         [unet.cuda() for unet in model.unets]
+    params = list(model.parameters())
+    for unet in model.unets:
+        params += list(unet.parameters())
     # setup optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=config.init_lr)
+    optimizer = torch.optim.Adam(params, lr=config.init_lr)
+
+    train_dataset, val_dataset = get_train_val_loader(config.level, config.batch_size, pin_memory=True)
+
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
     trainer.train()
 
