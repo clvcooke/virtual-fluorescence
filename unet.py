@@ -52,9 +52,9 @@ class UNet(nn.Module):
     def gen_conv_block(channels_in, channels_out, kernel_size=3,
                        pooling=True):
         layers = [
-            nn.Conv2d(channels_in, channels_out, kernel_size, padding='same'),
+            nn.Conv2d(channels_in, channels_out, kernel_size, padding=[1, 1]),
             nn.ReLU(),
-            nn.Conv2d(channels_out, channels_out, kernel_size, padding='same'),
+            nn.Conv2d(channels_out, channels_out, kernel_size, padding=[1, 1]),
             nn.ReLU()]
         if pooling:
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
