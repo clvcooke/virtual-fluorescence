@@ -21,7 +21,8 @@ def main(config):
     # setup optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=config.init_lr)
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
-    trainer.train_one_epoch()
+    trainer.train()
+
 
 if __name__ == "__main__":
     config, unparsed = get_config()
