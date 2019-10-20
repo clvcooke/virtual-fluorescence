@@ -18,7 +18,7 @@ class Trainer:
         self.num_train = len(self.train_loader.sampler.indices)
         self.num_valid = len(self.val_loader.sampler.indices)
         self.lr = self.config.init_lr
-        wandb.watch(self.model)
+        wandb.watch(self.model, log='all')
 
     def train(self):
         print(f"\n[*] Train on {self.num_train} samples, validate on {self.num_valid} samples")
