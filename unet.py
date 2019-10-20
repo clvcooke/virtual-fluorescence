@@ -4,7 +4,7 @@ from torch import nn as nn
 
 class UNet(nn.Module):
 
-    def __init__(self, num_classes, start_filters, channels_in=1):
+    def __init__(self, input_shape, num_classes, start_filters, channels_in=1):
         # five sets of standard conv blocks
         super().__init__()
         self.conv1 = self.gen_conv_block(channels_in, start_filters)
