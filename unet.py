@@ -38,7 +38,7 @@ class UNet(nn.Module):
             layers.append(nn.Softmax())
         else:
             layers.append(nn.Sigmoid())
-        return nn.Sequential(layers)
+        return nn.Sequential(*layers)
 
     @staticmethod
     def gen_upsampling_block(channels_in, channels_out):
@@ -58,7 +58,7 @@ class UNet(nn.Module):
             nn.ReLU()]
         if pooling:
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
-        return nn.Sequential(layers)
+        return nn.Sequential(*layers)
 
     def forward(self, x):
         x1 = self.conv1(x)

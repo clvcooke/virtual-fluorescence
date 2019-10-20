@@ -19,7 +19,7 @@ def main(config):
     # create a model
     model = Model(1)
     # setup optimizer
-    optimizer = torch.optim.Adam(lr=config.init_lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.init_lr)
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
     trainer.train_one_epoch()
 

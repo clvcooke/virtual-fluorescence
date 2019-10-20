@@ -16,7 +16,7 @@ def add_argument_group(name):
 
 # data params
 data_arg = add_argument_group('Data Params')
-data_arg.add_argument('--batch_size', type=int, default=32,
+data_arg.add_argument('--batch_size', type=int, default=4,
                       help='# of images in each batch of data')
 data_arg.add_argument('--shuffle', type=str2bool, default=True,
                       help='Whether to shuffle the train and valid indices')

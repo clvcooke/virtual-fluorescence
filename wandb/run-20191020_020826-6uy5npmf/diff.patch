@@ -1,0 +1,48 @@
+diff --git a/config.py b/config.py
+index ea5f50b..7c8737e 100644
+--- a/config.py
++++ b/config.py
+@@ -16,7 +16,7 @@ def add_argument_group(name):
+ 
+ # data params
+ data_arg = add_argument_group('Data Params')
+-data_arg.add_argument('--batch_size', type=int, default=32,
++data_arg.add_argument('--batch_size', type=int, default=4,
+                       help='# of images in each batch of data')
+ data_arg.add_argument('--shuffle', type=str2bool, default=True,
+                       help='Whether to shuffle the train and valid indices')
+diff --git a/main.py b/main.py
+index 00c8c47..4238bb8 100644
+--- a/main.py
++++ b/main.py
+@@ -19,7 +19,7 @@ def main(config):
+     # create a model
+     model = Model(1)
+     # setup optimizer
+-    optimizer = torch.optim.Adam(lr=config.init_lr)
++    optimizer = torch.optim.Adam(model.parameters(), lr=config.init_lr)
+     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
+     trainer.train_one_epoch()
+ 
+diff --git a/unet.py b/unet.py
+index 823c4a9..f4f7249 100644
+--- a/unet.py
++++ b/unet.py
+@@ -38,7 +38,7 @@ class UNet(nn.Module):
+             layers.append(nn.Softmax())
+         else:
+             layers.append(nn.Sigmoid())
+-        return nn.Sequential(layers)
++        return nn.Sequential(*layers)
+ 
+     @staticmethod
+     def gen_upsampling_block(channels_in, channels_out):
+@@ -58,7 +58,7 @@ class UNet(nn.Module):
+             nn.ReLU()]
+         if pooling:
+             layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+-        return nn.Sequential(layers)
++        return nn.Sequential(*layers)
+ 
+     def forward(self, x):
+         x1 = self.conv1(x)
