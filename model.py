@@ -1,4 +1,6 @@
+import os
 import torch
+import numpy as np
 import torch.nn as nn
 
 from modules import IlluminationLayer
@@ -16,3 +18,10 @@ class Model(nn.Module):
         illuminated_image = self.illumination_layer(x)
         results = [unet(illuminated_image) for unet in self.unets]
         return torch.stack(results)
+
+    def log_illumination(self, epoch, step):
+        # extract the illumination layers weight
+        weight = self.illumination_layer.physical_layer.weight.detach().cpu().numpy()
+        # save the weights
+        weight_path = os.path.join('/hddraid5/data/colin/ctc/patterns', f'epoch_{epoch}_step_{step}.npy')
+        np.save(weight_path, weight)

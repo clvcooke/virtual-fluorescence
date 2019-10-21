@@ -84,4 +84,6 @@ class Trainer:
                 batch_time.update(toc - tic)
                 pbar.set_description(f"{(toc - tic):.1f}s - loss: {loss_data:.3f}")
                 pbar.update(self.batch_size)
+                if training and i % 2 == 0:
+                    self.model.log_illumination(self.curr_epoch, i)
         return losses.avg
