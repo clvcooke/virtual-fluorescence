@@ -25,7 +25,7 @@ data_arg.add_argument('--level', type=int, default=2, help='# of levels of mask 
 
 # training params
 train_arg = add_argument_group('Training Params')
-train_arg.add_argument('--epochs', type=int, default=500,
+train_arg.add_argument('--epochs', type=int, default=50,
                        help='# of epochs to train for')
 train_arg.add_argument('--init_lr', type=float, default=1e-3,
                        help='Initial learning rate value')

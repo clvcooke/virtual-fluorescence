@@ -18,6 +18,7 @@ class Trainer:
         self.num_train = len(self.train_loader.sampler.indices)
         self.num_valid = len(self.val_loader.sampler.indices)
         self.lr = self.config.init_lr
+        self.curr_epoch = 0
         wandb.watch(self.model, log='all')
 
     def train(self):
@@ -25,6 +26,7 @@ class Trainer:
         best_val_loss = np.inf
         epochs_since_best = 0
         for epoch in range(self.config.epochs):
+            self.curr_epoch = epoch
             print(f'\nEpoch {epoch}/{self.config.epochs} -- lr = {self.lr}')
 
             train_loss = self.run_one_epoch(training=True)
