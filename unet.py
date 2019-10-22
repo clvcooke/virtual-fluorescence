@@ -41,12 +41,19 @@ class UNet(nn.Module):
         return nn.Sequential(*layers)
 
     @staticmethod
-    def gen_upsampling_block(channels_in, channels_out):
-        return nn.Sequential(
-            nn.ConvTranspose2d(channels_in, channels_out,
-                               kernel_size=2, stride=2),
-            nn.ReLU()
-        )
+    def gen_upsampling_block(channels_in, channels_out, transpose=False):
+        if transpose:
+            return nn.Sequential(
+                nn.ConvTranspose2d(channels_in, channels_out,
+                                   kernel_size=2, stride=2),
+                nn.ReLU()
+            )
+        else:
+            return nn.Sequential(
+                nn.Upsample(scale_factor=2, mode='nearest'),
+                nn.Conv2d(channels_in, channels_out, kernel_size=3, padding=[1,1]),
+                nn.ReLU()
+            )
 
     @staticmethod
     def gen_conv_block(channels_in, channels_out, kernel_size=3,
