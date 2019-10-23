@@ -35,6 +35,7 @@ class Trainer:
             is_best = val_loss < best_val_loss
             if is_best:
                 best_val_loss = val_loss
+                self.model.save_model(verbose=True)
             epochs_since_best = (epochs_since_best+1)*(1 - is_best)
             msg = f'train loss {train_loss:.3f} -- val loss {val_loss:.3f}'
             if is_best:
@@ -49,7 +50,7 @@ class Trainer:
                 self.lr = self.lr / np.sqrt(10)
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = self.lr
-                self.model.save_model(verbose=True)
+
 
     def run_one_epoch(self, training):
         tic = time.time()

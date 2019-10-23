@@ -39,4 +39,3 @@ class Model(nn.Module):
             torch.save(self, model_path)
             if verbose:
                 print(f"Saved model to: {model_path}")
-
