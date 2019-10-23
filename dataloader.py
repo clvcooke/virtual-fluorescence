@@ -19,16 +19,16 @@ class CustomDataset(torch.utils.data.Dataset):
 def get_train_val_loader(level, batch_size, pin_memory, num_workers=1):
     data_dir = '/hddraid5/data/colin/'
 
-    train_x_path = os.path.join(data_dir, 'train_x_norm.npy')
-    train_y_path = os.path.join(data_dir, f'train_level_{level}_y.npy')
-    val_x_path = os.path.join(data_dir, 'val_x_norm.npy')
-    val_y_path = os.path.join(data_dir, f'val_level_{level}_y.npy')
+    train_x_path = os.path.join(data_dir, 'train_x1_norm.npy')
+    train_y_path = os.path.join(data_dir, f'train_level_{level}_y1.npy')
+    val_x_path = os.path.join(data_dir, 'val_x1_norm.npy')
+    val_y_path = os.path.join(data_dir, f'val_level_{level}_y1.npy')
 
     # pytorch says channels fist
-    train_x = torch.from_numpy(np.load(train_x_path).swapaxes(1, 3)).float()
+    train_x = torch.from_numpy(np.load(train_x_path)).float()
     train_y = torch.from_numpy(np.load(train_y_path))
 
-    val_x = torch.from_numpy(np.load(val_x_path).swapaxes(1, 3)).float()
+    val_x = torch.from_numpy(np.load(val_x_path)).float()
     val_y = torch.from_numpy(np.load(val_y_path))
 
     train_dataset = CustomDataset(train_x, train_y)
