@@ -49,6 +49,7 @@ class Trainer:
                 self.lr = self.lr / np.sqrt(10)
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = self.lr
+                self.model.save_model(verbose=True)
 
     def run_one_epoch(self, training):
         tic = time.time()
