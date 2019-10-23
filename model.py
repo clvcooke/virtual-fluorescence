@@ -14,7 +14,7 @@ class Model(nn.Module):
     def __init__(self, num_heads):
         super().__init__()
         self.num_heads = num_heads
-        self.illumination_layer = IlluminationLayer(675)
+        self.illumination_layer = IlluminationLayer(1047)
         self.unets = [UNet(1, 16) for _ in range(self.num_heads)]
         self.run_name = os.path.basename(wandb.run.path)
     def forward(self, x):
