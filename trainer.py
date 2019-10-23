@@ -14,7 +14,7 @@ class Trainer:
         self.val_loader = validation_dataset
         self.config = config
         self.batch_size = self.config.batch_size
-        self.criterion = torch.nn.MSELoss()
+        self.criterion = torch.nn.L1Loss()
         self.num_train = len(self.train_loader.sampler.indices)
         self.num_valid = len(self.val_loader.sampler.indices)
         self.lr = self.config.init_lr
@@ -36,7 +36,7 @@ class Trainer:
             if is_best:
                 best_val_loss = val_loss
                 self.model.save_model(verbose=True)
-            epochs_since_best = (epochs_since_best+1)*(1 - is_best)
+            epochs_since_best = (epochs_since_best + 1) * (1 - is_best)
             msg = f'train loss {train_loss:.3f} -- val loss {val_loss:.3f}'
             if is_best:
                 msg += ' [*]'
@@ -50,7 +50,6 @@ class Trainer:
                 self.lr = self.lr / np.sqrt(10)
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = self.lr
-
 
     def run_one_epoch(self, training):
         tic = time.time()
@@ -66,7 +65,7 @@ class Trainer:
             for i, data in enumerate(dataset):
                 x, y = data
                 # no memcopy
-                y = y.view(1, -1, 1, x.shape[-2], x.shape[-1]).expand(self.model.num_heads,-1, -1, -1, -1)
+                y = y.view(1, -1, 1, x.shape[-2], x.shape[-1]).expand(self.model.num_heads, -1, -1, -1, -1)
                 if self.config.use_gpu:
                     x, y = x.cuda(), y.cuda()
                 output = self.model(x)
@@ -88,4 +87,11 @@ class Trainer:
                 pbar.update(self.batch_size)
                 if training and i % 2 == 0:
                     self.model.log_illumination(self.curr_epoch, i)
+                if not training and i == 0:
+                    y_sample = y[0, 0].view(256, 256).detach().cpu().numpy()
+                    p_sample = output[0, 0].view(256, 256).detach().cpu().numpy()
+                    wandb.log({f"images_epoch{self.curr_epoch}": [
+                        wandb.Image(np.round(p_sample * 255), caption="prediction"),
+                        wandb.Image(np.round(y_sample * 255), caption="label")]}, step=self.curr_epoch)
+
         return losses.avg

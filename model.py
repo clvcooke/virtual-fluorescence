@@ -14,9 +14,10 @@ class Model(nn.Module):
     def __init__(self, num_heads):
         super().__init__()
         self.num_heads = num_heads
-        self.illumination_layer = IlluminationLayer(1047)
+        self.illumination_layer = IlluminationLayer(675)
         self.unets = [UNet(1, 16) for _ in range(self.num_heads)]
         self.run_name = os.path.basename(wandb.run.path)
+
     def forward(self, x):
         illuminated_image = self.illumination_layer(x)
         results = [unet(illuminated_image) for unet in self.unets]
@@ -36,6 +37,11 @@ class Model(nn.Module):
             base_folder = '/hddraid5/data/colin/ctc/models'
             os.makedirs(base_folder, exist_ok=True)
             model_path = os.path.join(base_folder, f'model_{self.run_name}.pth')
-            torch.save(self, model_path)
+            torch.save(self.state_dict(), model_path)
+            for u in range(self.num_heads):
+                unet_path = os.path.join(base_folder, f'unet_{u}_{self.run_name}.pth')
+                torch.save(self.unets[u].state_dict(), unet_path)
+                if verbose:
+                    print("saved unet to : " + unet_path)
             if verbose:
                 print(f"Saved model to: {model_path}")

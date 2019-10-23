@@ -25,11 +25,19 @@ def get_train_val_loader(level, batch_size, pin_memory, num_workers=1):
     val_y_path = os.path.join(data_dir, f'val_level_{level}_y1.npy')
 
     # pytorch says channels fist
-    train_x = torch.from_numpy(np.load(train_x_path)).float()
-    train_y = torch.from_numpy(np.load(train_y_path))
+    mmap = True
+    if mmap:
+        train_x = torch.from_numpy(np.load(train_x_path, mmap_mode='r'))
+        train_y = torch.from_numpy(np.load(train_y_path, mmap_mode='r'))
 
-    val_x = torch.from_numpy(np.load(val_x_path)).float()
-    val_y = torch.from_numpy(np.load(val_y_path))
+        val_x = torch.from_numpy(np.load(val_x_path, mmap_mode='r'))
+        val_y = torch.from_numpy(np.load(val_y_path, mmap_mode='r'))
+    else:
+        train_x = torch.from_numpy(np.load(train_x_path))
+        train_y = torch.from_numpy(np.load(train_y_path))
+
+        val_x = torch.from_numpy(np.load(val_x_path))
+        val_y = torch.from_numpy(np.load(val_y_path))
 
     train_dataset = CustomDataset(train_x, train_y)
     val_dataset = CustomDataset(val_x, val_y)
