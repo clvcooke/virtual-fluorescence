@@ -17,12 +17,12 @@ class CustomDataset(torch.utils.data.Dataset):
 
 
 def get_train_val_loader(level, batch_size, pin_memory, num_workers=1):
-    data_dir = '/hddraid5/data/colin/augmented_microscopy/data/'
+    data_dir = '/hddraid5/data/colin/'
 
     train_x_path = os.path.join(data_dir, 'train_x_norm.npy')
-    train_y_path = os.path.join(data_dir, f'train_y_level_{level}.npy')
+    train_y_path = os.path.join(data_dir, f'train_level_{level}_y.npy')
     val_x_path = os.path.join(data_dir, 'val_x_norm.npy')
-    val_y_path = os.path.join(data_dir, f'val_y_level_{level}.npy')
+    val_y_path = os.path.join(data_dir, f'val_level_{level}_y.npy')
 
     # pytorch says channels fist
     train_x = torch.from_numpy(np.load(train_x_path).swapaxes(1, 3)).float()
