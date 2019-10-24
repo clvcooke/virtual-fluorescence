@@ -14,7 +14,7 @@ class UNet(nn.Module):
         self.conv5 = self.gen_conv_block(start_filters * 8, start_filters * 16)
 
         # four sets of upsampling layers
-        tranpose = True
+        tranpose = False
         self.up6 = self.gen_upsampling_block(start_filters * 16, start_filters * 8, tranpose)
         self.conv6 = self.gen_conv_block(start_filters * 16, start_filters * 8, pooling=False)
 
