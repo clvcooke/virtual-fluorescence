@@ -14,16 +14,17 @@ class UNet(nn.Module):
         self.conv5 = self.gen_conv_block(start_filters * 8, start_filters * 16)
 
         # four sets of upsampling layers
-        self.up6 = self.gen_upsampling_block(start_filters * 16, start_filters * 8)
+        tranpose = True
+        self.up6 = self.gen_upsampling_block(start_filters * 16, start_filters * 8, tranpose)
         self.conv6 = self.gen_conv_block(start_filters * 16, start_filters * 8, pooling=False)
 
-        self.up7 = self.gen_upsampling_block(start_filters * 8, start_filters * 4)
+        self.up7 = self.gen_upsampling_block(start_filters * 8, start_filters * 4, tranpose)
         self.conv7 = self.gen_conv_block(start_filters * 8, start_filters * 4, pooling=False)
 
-        self.up8 = self.gen_upsampling_block(start_filters * 4, start_filters * 2)
+        self.up8 = self.gen_upsampling_block(start_filters * 4, start_filters * 2, tranpose)
         self.conv8 = self.gen_conv_block(start_filters * 4, start_filters * 2, pooling=False)
 
-        self.up9 = self.gen_upsampling_block(start_filters * 2, start_filters)
+        self.up9 = self.gen_upsampling_block(start_filters * 2, start_filters, tranpose)
         self.conv9 = self.gen_conv_block(start_filters * 2, start_filters, pooling=False)
         # 1x1xC conv with no upsampling
         self.conv10 = nn.Sequential(
