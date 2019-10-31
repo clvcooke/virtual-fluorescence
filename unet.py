@@ -14,16 +14,16 @@ class UNet(nn.Module):
         self.conv5 = self.gen_conv_block(start_filters * 8, start_filters * 16, batch_norm=batch_norm)
 
         # four sets of upsampling layers
-        self.up6 = self.gen_upsampling_block(start_filters * 16, start_filters * 8, transpose, batch_norm=batch_norm)
+        self.up6 = self.gen_upsampling_block(start_filters * 16, start_filters * 8, transpose)
         self.conv6 = self.gen_conv_block(start_filters * 16, start_filters * 8, pooling=False, batch_norm=batch_norm)
 
-        self.up7 = self.gen_upsampling_block(start_filters * 8, start_filters * 4, transpose, batch_norm=batch_norm)
+        self.up7 = self.gen_upsampling_block(start_filters * 8, start_filters * 4, transpose)
         self.conv7 = self.gen_conv_block(start_filters * 8, start_filters * 4, pooling=False, batch_norm=batch_norm)
 
-        self.up8 = self.gen_upsampling_block(start_filters * 4, start_filters * 2, transpose, batch_norm=batch_norm)
+        self.up8 = self.gen_upsampling_block(start_filters * 4, start_filters * 2, transpose)
         self.conv8 = self.gen_conv_block(start_filters * 4, start_filters * 2, pooling=False, batch_norm=batch_norm)
 
-        self.up9 = self.gen_upsampling_block(start_filters * 2, start_filters, transpose, batch_norm=batch_norm)
+        self.up9 = self.gen_upsampling_block(start_filters * 2, start_filters, transpose)
         self.conv9 = self.gen_conv_block(start_filters * 2, start_filters, pooling=False, batch_norm=batch_norm)
         # 1x1xC conv with no upsampling
         self.conv10 = nn.Sequential(
