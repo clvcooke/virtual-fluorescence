@@ -11,11 +11,11 @@ import os
 
 
 class Model(nn.Module):
-    def __init__(self, num_heads, num_channels=1):
+    def __init__(self, num_heads, num_channels=1, batch_norm=False):
         super().__init__()
         self.num_heads = num_heads
         self.illumination_layer = IlluminationLayer(675, num_channels)
-        self.unets = [UNet(1, 16, num_channels) for _ in range(self.num_heads)]
+        self.unets = [UNet(1, 16, num_channels, batch_norm=batch_norm) for _ in range(self.num_heads)]
         try:
             self.run_name = os.path.basename(wandb.run.path)
         except:

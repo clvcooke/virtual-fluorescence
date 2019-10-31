@@ -16,7 +16,7 @@ def main(config):
         torch.cuda.manual_seed(config.random_seed)
     # get data-loaders
     # create a model
-    model = Model(config.num_heads, config.num_channels)
+    model = Model(config.num_heads, config.num_channels, batch_norm=config.batch_norm)
     if config.use_gpu:
         model.cuda()
         [unet.cuda() for unet in model.unets]
