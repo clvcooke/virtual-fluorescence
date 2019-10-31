@@ -11,7 +11,7 @@ import os
 
 
 class Model(nn.Module):
-    def __init__(self, num_heads, num_channels):
+    def __init__(self, num_heads, num_channels=1):
         super().__init__()
         self.num_heads = num_heads
         self.illumination_layer = IlluminationLayer(675, num_channels)

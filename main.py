@@ -16,7 +16,7 @@ def main(config):
         torch.cuda.manual_seed(config.random_seed)
     # get data-loaders
     # create a model
-    model = Model(1)
+    model = Model(config.num_heads, config.num_channels)
     if config.use_gpu:
         model.cuda()
         [unet.cuda() for unet in model.unets]
@@ -29,6 +29,7 @@ def main(config):
     train_dataset, val_dataset = get_train_val_loader(config.level, config.batch_size, pin_memory=True)
 
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
+    wandb.config.update(config)
     trainer.train()
 
 

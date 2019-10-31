@@ -40,6 +40,10 @@ misc_arg.add_argument('--use_gpu', type=str2bool, default=True,
                       help="Whether to run on the GPU")
 misc_arg.add_argument('--random_seed', type=int, default=1,
                       help='Seed to ensure reproducibility')
+misc_arg.add_argument('--num_channels', type=int, default=1,
+                      help='Number of images to form with the physical layer')
+misc_arg.add_argument('--num_heads', type=int, default=1,
+                      help='Number of models to attach physical layer to')
 
 
 def get_config():
