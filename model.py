@@ -11,12 +11,16 @@ import os
 
 
 class Model(nn.Module):
-    def __init__(self, num_heads):
+    def __init__(self, num_heads, num_channels):
         super().__init__()
         self.num_heads = num_heads
-        self.illumination_layer = IlluminationLayer(675)
-        self.unets = [UNet(1, 16) for _ in range(self.num_heads)]
-        self.run_name = os.path.basename(wandb.run.path)
+        self.illumination_layer = IlluminationLayer(675, num_channels)
+        self.unets = [UNet(1, 16, num_channels) for _ in range(self.num_heads)]
+        try:
+            self.run_name = os.path.basename(wandb.run.path)
+        except:
+            pass
+
 
     def forward(self, x):
         illuminated_image = self.illumination_layer(x)
