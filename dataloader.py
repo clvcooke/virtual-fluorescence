@@ -16,16 +16,27 @@ class CustomDataset(torch.utils.data.Dataset):
         return (image, label)
 
 
-def get_train_val_loader(level, batch_size, pin_memory, num_workers=1):
+def get_train_val_loader(config, pin_memory, num_workers=1):
+    level, batch_size = config.level, config.batch_size
     data_dir = '/hddraid5/data/colin/'
 
-    train_x_path = os.path.join(data_dir, 'train_x1_norm.npy')
-    train_y_path = os.path.join(data_dir, f'train_level_{level}_y1.npy')
-    val_x_path = os.path.join(data_dir, 'val_x1_norm.npy')
-    val_y_path = os.path.join(data_dir, f'val_level_{level}_y1.npy')
+    if str(config.task).lower() == 'hela':
+        mmap = False
+        bits = int(np.log2(level))
+        train_x_path = os.path.join(data_dir, 'ctc', 'train_x_norm.npy')
+        train_y_path = os.path.join(data_dir, 'ctc', f'new_nuc_train_kb{bits}.npy')
+        val_x_path = os.path.join(data_dir, 'ctc', 'val_x_norm.npy')
+        val_y_path = os.path.join(data_dir, 'ctc', f'new_nuc_val_kb{bits}.npy')
+        channels_first = False
+    else:
+        mmap = True
+        train_x_path = os.path.join(data_dir, 'train_x1_norm.npy')
+        train_y_path = os.path.join(data_dir, f'train_level_{level}_y1.npy')
+        val_x_path = os.path.join(data_dir, 'val_x1_norm.npy')
+        val_y_path = os.path.join(data_dir, f'val_level_{level}_y1.npy')
+        channels_first = True
 
     # pytorch says channels fist
-    mmap = True
     if mmap:
         train_x = torch.from_numpy(np.load(train_x_path, mmap_mode='r'))
         train_y = torch.from_numpy(np.load(train_y_path, mmap_mode='r'))
@@ -33,11 +44,12 @@ def get_train_val_loader(level, batch_size, pin_memory, num_workers=1):
         val_x = torch.from_numpy(np.load(val_x_path, mmap_mode='r'))
         val_y = torch.from_numpy(np.load(val_y_path, mmap_mode='r'))
     else:
-        train_x = torch.from_numpy(np.load(train_x_path))
-        train_y = torch.from_numpy(np.load(train_y_path))
+        train_x = torch.from_numpy(np.load(train_x_path)).float()
+        train_y = torch.from_numpy(np.load(train_y_path)).float()
 
-        val_x = torch.from_numpy(np.load(val_x_path))
-        val_y = torch.from_numpy(np.load(val_y_path))
+        val_x = torch.from_numpy(np.load(val_x_path)).float()
+        val_y = torch.from_numpy(np.load(val_y_path)).float()
+
 
     train_dataset = CustomDataset(train_x, train_y)
     val_dataset = CustomDataset(val_x, val_y)

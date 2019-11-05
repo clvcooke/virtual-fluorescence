@@ -26,7 +26,7 @@ def main(config):
     # setup optimizer
     optimizer = torch.optim.Adam(params, lr=config.init_lr)
 
-    train_dataset, val_dataset = get_train_val_loader(config.level, config.batch_size, pin_memory=True)
+    train_dataset, val_dataset = get_train_val_loader(config, pin_memory=True)
 
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
     wandb.config.update(config)

@@ -46,6 +46,8 @@ misc_arg.add_argument('--num_heads', type=int, default=1,
                       help='Number of models to attach physical layer to')
 misc_arg.add_argument('--batch_norm', type=str2bool, default=False,
                       help='To use batchnorm or not (every layer)')
+misc_arg.add_argument('--task', type=str, default='pan',
+                      help='Task to train on')
 
 
 def get_config():

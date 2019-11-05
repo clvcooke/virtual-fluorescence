@@ -21,7 +21,6 @@ class Model(nn.Module):
         except:
             pass
 
-
     def forward(self, x):
         illuminated_image = self.illumination_layer(x)
         results = [unet(illuminated_image) for unet in self.unets]
