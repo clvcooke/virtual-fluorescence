@@ -14,7 +14,8 @@ class Trainer:
         self.val_loader = validation_dataset
         self.config = config
         self.batch_size = self.config.batch_size
-        self.criterion = torch.nn.L1Loss()
+#        self.criterion = torch.nn.L1Loss()
+        self.criterion = torch.nn.MSELoss()
         self.num_train = len(self.train_loader.sampler.indices)
         self.num_valid = len(self.val_loader.sampler.indices)
         self.lr = self.config.init_lr
@@ -71,7 +72,8 @@ class Trainer:
                 output = self.model(x)
                 if training:
                     self.optimizer.zero_grad()
-                loss = self.criterion(output, y)
+                R = 1.0
+                loss = self.criterion(output*R, y*R)
                 if training:
                     loss.backward()
                     self.optimizer.step()
