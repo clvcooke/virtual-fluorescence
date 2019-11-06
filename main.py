@@ -12,6 +12,7 @@ wandb.init("CTC")
 def main(config):
     # setup
     torch.manual_seed(config.random_seed)
+    torch.set_num_threads(1)
     if config.use_gpu:
         torch.cuda.manual_seed(config.random_seed)
     # get data-loaders
