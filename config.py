@@ -48,7 +48,10 @@ misc_arg.add_argument('--batch_norm', type=str2bool, default=False,
                       help='To use batchnorm or not ( every layer)')
 misc_arg.add_argument('--task', type=str, default='pan',
                       help='Task to train on')
-
+misc_arg.add_argument('--skip', type=str2bool, default=False,
+                      help='Skip physical layer and feed directly into neural network')
+misc_arg.add_argument('--init_strategy', type=str, default=None,
+                      help='initialization strategy for physical layer')
 
 def get_config():
     config, unparsed = parser.parse_known_args()
