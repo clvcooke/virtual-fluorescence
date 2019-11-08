@@ -31,13 +31,13 @@ class IlluminationLayer(nn.Module):
     def init_center(self):
         for i in range(675):
             if i % 225 == 0:
-                self.physical_layer.weight[i] = 1
+                self.physical_layer.weight[0, i] = 1
             else:
-                self.physical_layer.weight[i] = 0
+                self.physical_layer.weight[0, i] = 0
 
     def init_all(self):
         for i in range(675):
-            self.physical_layer.weight[i] = 1 / 675
+            self.physical_layer.weight[0, i] = 1 / 675
 
     def init_dpc(self, vertical=False):
         pattern = np.zeros((15, 15))
@@ -54,7 +54,7 @@ class IlluminationLayer(nn.Module):
         for i in range(3):
             for j in range(225):
                 idx = i * 225 + j
-                self.physical_layer.weight[idx] = pattern[j]
+                self.physical_layer.weight[0, idx] = pattern[j]
 
     def init_brightfield(self, cutoff=4, brightfield_value=None, darkfield_value=0):
         '''
@@ -83,7 +83,7 @@ class IlluminationLayer(nn.Module):
         for i in range(3):
             for j in range(225):
                 idx = i * 225 + j
-                self.physical_layer.weight[idx] = pattern[j]
+                self.physical_layer.weight[0, idx] = pattern[j]
 
     def forward(self, x):
         return self.physical_layer(x)
