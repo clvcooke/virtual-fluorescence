@@ -24,9 +24,23 @@ class IlluminationLayer(nn.Module):
             elif init_strategy == 'random':
                 # don't do anything, weights are already random
                 pass
+            elif init_strategy == 'off_axis':
+                self.init_off_axis()
             else:
                 # don't allow unspecified strategies to silently fail
                 raise RuntimeError
+
+    def init_off_axis(self):
+        pattern = np.zeros((15, 15))
+        # off axis will be two off center?
+        pattern[7, 9] = 1
+        for i in range(3):
+            pattern = from_spiral(pattern).flatten()
+            for i in range(3):
+                for j in range(225):
+                    idx = i * 225 + j
+                    self.physical_layer.weight[0, idx] = pattern[j]
+
 
     def init_center(self):
         for i in range(675):
