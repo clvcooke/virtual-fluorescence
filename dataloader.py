@@ -33,22 +33,19 @@ def load_progress(path, desc=''):
 def get_train_val_loader(config, pin_memory, num_workers=1):
     level, batch_size = config.level, config.batch_size
     data_dir = '/hddraid5/data/colin/'
-
+    bits = int(np.log2(level))
     if str(config.task).lower() == 'hela':
         mmap = False
-        bits = int(np.log2(level))
         train_x_path = os.path.join(data_dir, 'ctc', 'train_x_norm.npy')
         train_y_path = os.path.join(data_dir, 'ctc', f'new_nuc_train_kb{bits}.npy')
         val_x_path = os.path.join(data_dir, 'ctc', 'val_x_norm.npy')
         val_y_path = os.path.join(data_dir, 'ctc', f'new_nuc_val_kb{bits}.npy')
-        channels_first = False
     else:
-        mmap = True
-        train_x_path = os.path.join(data_dir, 'train_x1_norm.npy')
-        train_y_path = os.path.join(data_dir, f'train_level_{level}_y1.npy')
-        val_x_path = os.path.join(data_dir, 'val_x1_norm.npy')
-        val_y_path = os.path.join(data_dir, f'val_level_{level}_y1.npy')
-        channels_first = True
+        mmap = False
+        train_x_path = os.path.join(data_dir, 'ctc', 'pan_train_x.npy')
+        train_y_path = os.path.join(data_dir, 'ctc', f'pan_train_{bits}_y.npy')
+        val_x_path = os.path.join(data_dir, 'ctc', 'pan_val_x.npy')
+        val_y_path = os.path.join(data_dir, 'ctc', f'pan_val_{bits}_y.npy')
 
     # pytorch says channels fist
     if mmap:
