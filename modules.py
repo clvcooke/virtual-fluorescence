@@ -9,7 +9,7 @@ class IlluminationLayer(nn.Module):
     def __init__(self, k_depth, num_channels, init_strategy, init_params=None):
         super().__init__()
         self.physical_layer = nn.Conv2d(k_depth, num_channels, kernel_size=1, stride=1, bias=False)
-        if init_strategy is not None:
+        if init_strategy is not None and init_strategy != "learned":
             # we assume that if we are intitializing then we don't want to train
             for param in self.physical_layer.parameters():
                 param.requires_grad = False
