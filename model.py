@@ -10,15 +10,16 @@ import os
 
 
 class Model(nn.Module):
-    def __init__(self, num_heads, num_channels=1, batch_norm=False, skip=False, initilization_strategy=None):
+    def __init__(self, num_heads, num_channels=1, batch_norm=False, skip=False, initilization_strategy=None,
+                 num_filters=16):
         super().__init__()
         self.num_heads = num_heads
         self.skip = skip
         if not skip:
             self.illumination_layer = IlluminationLayer(675, num_channels, initilization_strategy)
-            self.unets = [UNet(1, 16, num_channels, batch_norm=batch_norm) for _ in range(self.num_heads)]
+            self.unets = [UNet(1, num_filters, num_channels, batch_norm=batch_norm) for _ in range(self.num_heads)]
         else:
-            self.unets = [UNet(1, 16, 675, batch_norm=batch_norm) for _ in range(self.num_heads)]
+            self.unets = [UNet(1, num_filters, 675, batch_norm=batch_norm) for _ in range(self.num_heads)]
         try:
             self.run_name = os.path.basename(wandb.run.path)
         except:

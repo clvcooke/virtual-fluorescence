@@ -52,6 +52,8 @@ misc_arg.add_argument('--skip', type=str2bool, default=False,
                       help='Skip physical layer and feed directly into neural network')
 misc_arg.add_argument('--init_strategy', type=str, default=None,
                       help='initialization strategy for physical layer')
+misc_arg.add_argument('--num_filters', type=int, default=16,
+                      help="number of starting filters in U-net")
 
 def get_config():
     config, unparsed = parser.parse_known_args()

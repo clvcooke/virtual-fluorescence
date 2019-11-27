@@ -18,7 +18,7 @@ def main(config):
     # get data-loaders
     # create a model
     model = Model(config.num_heads, config.num_channels, batch_norm=config.batch_norm, skip=config.skip,
-                  initilization_strategy=config.init_strategy)
+                  initilization_strategy=config.init_strategy, num_filters=config.num_filters)
     if config.use_gpu:
         model.cuda()
         [unet.cuda() for unet in model.unets]
