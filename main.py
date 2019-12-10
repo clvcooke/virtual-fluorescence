@@ -18,13 +18,13 @@ def main(config):
     # get data-loaders
     # create a model
     model = Model(config.num_heads, config.num_channels, batch_norm=config.batch_norm, skip=config.skip,
-                  initilization_strategy=config.init_strategy, num_filters=config.num_filters)
+                  initilization_strategy=config.init_strategy, num_filters=config.num_filters, task=config.task)
     if config.use_gpu:
         model.cuda()
-        [unet.cuda() for unet in model.unets]
+        [net.cuda() for net in model.nets]
     params = list(model.parameters())
-    for unet in model.unets:
-        params += list(unet.parameters())
+    for net in model.nets:
+        params += list(net.parameters())
     # setup optimizer
     optimizer = torch.optim.Adam(params, lr=config.init_lr)
 
