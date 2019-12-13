@@ -7,7 +7,7 @@ class Classifier(nn.Module):
         super().__init__()
         # we will follow a super simple classiier structure
         # input image is going to be 28x28xc where c is the number of channels
-        start_filters = 4
+        start_filters = 8
         self.conv1 = self.gen_conv_block(channels_in, start_filters, kernel_size=3, batch_norm=batch_norm)
         self.conv2 = self.gen_conv_block(start_filters, start_filters * 2, kernel_size=3, batch_norm=batch_norm)
         self.conv3 = self.gen_conv_block(start_filters * 2, start_filters * 4, kernel_size=3, batch_norm=batch_norm)
