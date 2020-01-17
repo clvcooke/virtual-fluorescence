@@ -41,7 +41,35 @@ def load_progress(path, desc=''):
 def get_train_val_loader(config, pin_memory, num_workers=1):
     data_dir = '/hddraid5/data/colin/'
 
-    if str(config.task).lower() == 'mnist':
+    if str(config.task).lower() == 'malaria':
+        batch_size = config.batch_size
+        # save prev seed
+        seed = config.random_seed
+        # split data based on constant zero seed
+        np.random.seed(0)
+        train_x_path = '/content/malaria_norm.npy'
+        train_y_path = '/content/malaria_labels.npy'
+        train_split = 0.8
+        x_data = load_progress(train_x_path, 'loading x data')
+        y_data = load_progress(train_y_path, 'loading y data')
+        y_data = y_data.astype(np.int)
+        # (1021, 28, 28, 96)
+        x_data = np.swapaxes(x_data, 1, 3).astype(np.float32)
+        # (1021, 96, 28, 28)
+        x_data = x_data/255
+        amnt = x_data.shape[0]
+        train_amnt = int(amnt * train_split)
+        indices = np.arange(0, amnt)
+        np.random.shuffle(indices)
+        train_indices = indices[:train_amnt]
+        val_indices = indices[train_amnt:]
+        train_x = torch.from_numpy(x_data[train_indices])
+        train_y = torch.from_numpy(y_data[train_indices])
+        val_x = torch.from_numpy(x_data[val_indices])
+        val_y = torch.from_numpy(y_data[val_indices])
+        # re-seed with specified seed
+        np.random.seed(seed)
+    elif str(config.task).lower() == 'mnist':
         batch_size = config.batch_size
         # save prev seed
         seed = config.random_seed

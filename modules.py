@@ -1,7 +1,7 @@
 import torch.nn as nn
 import numpy as np
 
-from utils import from_spiral
+from utils import from_spiral, to_spiral
 
 
 class IlluminationLayer(nn.Module):
@@ -34,8 +34,8 @@ class IlluminationLayer(nn.Module):
         pattern = np.zeros((15, 15))
         # off axis will be two off center?
         pattern[7, 9] = 1
+        pattern = to_spiral(pattern).flatten()
         for i in range(3):
-            pattern = from_spiral(pattern).flatten()
             for i in range(3):
                 for j in range(225):
                     idx = i * 225 + j

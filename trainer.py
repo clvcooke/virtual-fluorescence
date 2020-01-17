@@ -15,7 +15,8 @@ class Trainer:
         self.config = config
         self.batch_size = self.config.batch_size
 #        self.criterion = torch.nn.L1Loss()
-        if str(config.task).lower() == 'mnist':
+        task = str(config.task).lower()
+        if task == 'mnist' or task == 'malaria':
             self.criterion = torch.nn.CrossEntropyLoss()
             self.classification = True
         else:

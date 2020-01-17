@@ -16,7 +16,14 @@ class Model(nn.Module):
         super().__init__()
         self.num_heads = num_heads
         self.skip = skip
-        if str(task).lower() == 'mnist':
+        self.task = task
+        if str(task).lower() == 'malaria':
+            if skip:
+                raise RuntimeError("We aren't testing this!")
+            else:
+                self.illumination_layer = IlluminationLayer(96, num_channels, initilization_strategy)
+                self.nets = [Classifier(2, num_channels, batch_norm=batch_norm) for _ in range(self.num_heads)]
+        elif str(task).lower() == 'mnist':
             if skip:
                 raise RuntimeError("We aren't testing this!")
             else:
@@ -42,7 +49,7 @@ class Model(nn.Module):
         return torch.stack(results)
 
     def log_illumination(self, epoch, step):
-        if self.skip:
+        if self.skip or self.task == 'malaria':
             return
         # extract the illumination layers weight
         weight = self.illumination_layer.physical_layer.weight.detach().cpu().numpy()
@@ -54,7 +61,10 @@ class Model(nn.Module):
         # if no path given try to get path from W&B
         # if that fails use a UUID
         if file_path is None:
-            base_folder = '/hddraid5/data/colin/ctc/models'
+            if self.task.lower() is not 'mnist':
+                base_folder = '/hddraid5/data/colin/ctc/models'
+            else:
+                base_folder = '/content'
             os.makedirs(base_folder, exist_ok=True)
             model_path = os.path.join(base_folder, f'model_{self.run_name}.pth')
             if not self.skip:
