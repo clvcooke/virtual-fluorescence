@@ -8,12 +8,12 @@ from tqdm import tqdm
 
 def predict(run_id, level, task):
     model_path = f'/hddraid5/data/colin/ctc/models/model_{run_id}.pth'
-    unet_path = f'/hddraid5/data/colin/ctc/models/unet_0_{run_id}.pth'
+    unet_path = f'/hddraid5/data/colin/ctc/models/net_0_{run_id}.pth'
     model = Model(num_heads=1, batch_norm=True)
     model_state = torch.load(model_path)
     unet_state = torch.load(unet_path)
     model.load_state_dict(model_state)
-    model.unets[0].load_state_dict(unet_state)
+    model.nets[0].load_state_dict(unet_state)
 
     # for now we will only ever load test data
     data_dir = '/hddraid5/data/colin/ctc/'
@@ -34,11 +34,13 @@ def predict(run_id, level, task):
         test_x_batch = test_x[index:index + batch_size].float()
         with torch.no_grad():
             predictions = model(test_x_batch).cpu().numpy()
-        out_path = os.path.join(predictions_dir, f'level_{level}_r{run_id}_i{index}.npy')
-        np.save(os.path.join(predictions_dir, f'level_{level}_i{index}_x.npy'), test_x_batch.numpy())
+        out_path = os.path.join(predictions_dir, f'level_{level}_r{run_id}_i{index//batch_size}.npy')
+        np.save(os.path.join(predictions_dir, f'level_{level}_i{index//batch_size}_x.npy'), test_x_batch.numpy())
         np.save(out_path, predictions.reshape(batch_size, 256, 256))
-        break
 
 
 if __name__ == "__main__":
-    predict('t8rrxm50', 2, 'pan')
+    predict('wkw2wrd6', 128, 'hela')
+
+
+
