@@ -31,11 +31,37 @@ def load_progress(path, desc=''):
         block_size = 2
         n_blocks = int(np.ceil(mmap_array.shape[0] / block_size))
         for b in tqdm(range(n_blocks), desc=desc):
-            array[b*block_size:(b+1)*block_size] = mmap_array[b*block_size:(b+1)*block_size]
+            array[b * block_size:(b + 1) * block_size] = mmap_array[b * block_size:(b + 1) * block_size]
     finally:
         del mmap_array
     return array
 
+
+def shift_data(shift_code, data, image_shape=[675, 256, 256]):
+    if shift_code == '':
+        return data
+    # if we are going to shift  we can use N S E W along with a number (1-10)
+    direction = shift_code[0].upper()
+    amnt = int(shift_code[1:])
+    assert direction in ['N', 'S', 'E', 'W']
+    # we need to do a reshape first
+    data = np.reshape(data, list(data.shape[0:1]) + [3, 15, 15, 256, 256])
+    # now we need to cutoff the data on the correct axis
+    if direction == 'S':
+        data = data[:, :, amnt:]
+        data = np.pad(data, pad_width=[[0, 0], [0, 0], [amnt, 0], [0, 0], [0, 0], [0, 0]])
+    elif direction == 'N':
+        data = data[:, :, :-amnt]
+        data = np.pad(data, pad_width=[[0, 0], [0, 0], [0, amnt], [0, 0], [0, 0], [0, 0]])
+    elif direction == 'E':
+        data = data[:, :, :, :-amnt]
+        data = np.pad(data, pad_width=[[0, 0], [0, 0], [0, 0], [0, amnt], [0, 0], [0, 0]])
+    else:
+        data = data[:, :, :, amnt:]
+        data = np.pad(data, pad_width=[[0, 0], [0, 0], [0, 0], [amnt, 0], [0, 0], [0, 0]])
+    # reshape the data back to the proper format
+    data = np.reshape(data, [-1] + image_shape)
+    return data
 
 
 def get_train_val_loader(config, pin_memory, num_workers=1):
@@ -56,7 +82,7 @@ def get_train_val_loader(config, pin_memory, num_workers=1):
         # (1021, 28, 28, 96)
         x_data = np.swapaxes(x_data, 1, 3).astype(np.float32)
         # (1021, 96, 28, 28)
-        x_data = x_data/255
+        x_data = x_data / 255
         amnt = x_data.shape[0]
         train_amnt = int(amnt * train_split)
         indices = np.arange(0, amnt)
@@ -88,7 +114,7 @@ def get_train_val_loader(config, pin_memory, num_workers=1):
         # 60K 25 784
         x_data = x_data.reshape((-1, 25, 28, 28))
         amnt = x_data.shape[0]
-        train_amnt = int(amnt*train_split)
+        train_amnt = int(amnt * train_split)
         indices = np.arange(0, amnt)
         np.random.shuffle(indices)
         train_indices = indices[:train_amnt]
@@ -117,16 +143,18 @@ def get_train_val_loader(config, pin_memory, num_workers=1):
 
         # pytorch says channels fist
         if mmap:
-            train_x = torch.from_numpy(np.load(train_x_path, mmap_mode='r'))
+            train_x_npy = shift_data(config.shift, np.load(train_x_path, mmap_mode='r'))
+            train_x = torch.from_numpy(train_x_npy)
             train_y = torch.from_numpy(np.load(train_y_path, mmap_mode='r'))
-
-            val_x = torch.from_numpy(np.load(val_x_path, mmap_mode='r'))
+            val_x_npy = shift_data(config.shift, np.load(val_x_path, mmap_mode='r'))
+            val_x = torch.from_numpy(val_x_npy)
             val_y = torch.from_numpy(np.load(val_y_path, mmap_mode='r'))
         else:
-            train_x = torch.from_numpy(load_progress(train_x_path, 'loading train_x'))
+            train_x_npy = shift_data(config.shift, load_progress(train_x_path, 'loading train x'))
+            train_x = torch.from_numpy(train_x_npy)
             train_y = torch.from_numpy(load_progress(train_y_path, 'loading train_y'))
-
-            val_x = torch.from_numpy(load_progress(val_x_path, 'loading val_x'))
+            val_x_npy = shift_data(config.shift, load_progress(val_x_path, 'loading val_x'))
+            val_x = torch.from_numpy(val_x_npy)
             val_y = torch.from_numpy(load_progress(val_y_path, 'loading val_y'))
 
     train_dataset = CustomDataset(train_x, train_y)

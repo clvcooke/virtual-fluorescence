@@ -1,9 +1,8 @@
-import os
 import torch
 import numpy as np
 import torch.nn as nn
 
-from modules import IlluminationLayer
+from modules import IlluminationLayer, GaussianNoise
 from unet import UNet
 from classifier import Classifier
 import wandb
@@ -12,11 +11,14 @@ import os
 
 class Model(nn.Module):
     def __init__(self, num_heads, num_channels=1, batch_norm=False, skip=False, initilization_strategy=None,
-                 num_filters=16, task='hela'):
+                 num_filters=16, task='hela', noise=0.0):
         super().__init__()
         self.num_heads = num_heads
         self.skip = skip
         self.task = task
+        self.noise_layer = GaussianNoise(noise)
+        self.batchnorm = nn.BatchNorm2d(num_channels)
+
         if str(task).lower() == 'malaria':
             if skip:
                 raise RuntimeError("We aren't testing this!")
@@ -45,6 +47,11 @@ class Model(nn.Module):
             illuminated_image = x
         else:
             illuminated_image = self.illumination_layer(x)
+        if self.noise_layer.active:
+            # batchnorm image prior to processing so noise is effective
+            illuminated_image = self.batchnorm(illuminated_image)
+            # adding gaussian noise, pass through if sigma is zero
+            illuminated_image = self.noise_layer(illuminated_image)
         results = [net(illuminated_image) for net in self.nets]
         return torch.stack(results)
 

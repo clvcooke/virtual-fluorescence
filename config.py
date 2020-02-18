@@ -55,6 +55,11 @@ misc_arg.add_argument('--init_strategy', type=str, default=None,
 misc_arg.add_argument('--num_filters', type=int, default=16,
                       help="number of starting filters in U-net")
 
+# variance control
+misc_arg.add_argument('--shift', type=str, default="", help="shifting of the LED pattern")
+misc_arg.add_argument('--noise', type=float, default=0.0, help='amount of noise to add to the formed image')
+
+
 def get_config():
     config, unparsed = parser.parse_known_args()
     return config, unparsed
