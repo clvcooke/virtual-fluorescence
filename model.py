@@ -17,6 +17,7 @@ class Model(nn.Module):
         self.skip = skip
         self.task = task
         self.noise_layer = GaussianNoise(noise)
+        self.hardtanh = nn.Hardtanh(-1, 1)
         self.batchnorm = nn.BatchNorm2d(num_channels)
 
         if str(task).lower() == 'malaria':
@@ -48,8 +49,9 @@ class Model(nn.Module):
         else:
             illuminated_image = self.illumination_layer(x)
         if self.noise_layer.active:
-            # batchnorm image prior to processing so noise is effective
-            illuminated_image = self.batchnorm(illuminated_image)
+            # clip the image so that noise is effective
+            print("pre max/min: ", torch.max(illuminated_image), torch.min(illuminated_image))
+            illuminated_image = self.hardtanh(illuminated_image)
             # adding gaussian noise, pass through if sigma is zero
             illuminated_image = self.noise_layer(illuminated_image)
         results = [net(illuminated_image) for net in self.nets]
