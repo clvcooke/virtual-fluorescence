@@ -75,6 +75,7 @@ if __name__ == "__main__":
     levels = [2, 4, 8, 16, 32, 64, 128]
     tasks = ['pan']
     strategies = ['dpc', 'learned', 'off_axis', 'all', 'random', 'center']
+    strategies = ['dpc', 'off_axis', 'all', 'random', 'center']
     out_dir = os.path.join('/hddraid5/data/colin/ctc/accs')
     os.makedirs(out_dir, exist_ok=True)
     for task in tasks:

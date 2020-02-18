@@ -35,12 +35,13 @@ def predict(run_id, level, task):
         with torch.no_grad():
             predictions = model(test_x_batch).cpu().numpy()
         out_path = os.path.join(predictions_dir, f'level_{level}_r{run_id}_i{index//batch_size}.npy')
-        np.save(os.path.join(predictions_dir, f'level_{level}_i{index//batch_size}_x.npy'), test_x_batch.numpy())
+        # np.save(os.path.join(predictions_dir, f'level_{level}_i{index//batch_size}_x.npy'), test_x_batch.numpy())
         np.save(out_path, predictions.reshape(batch_size, 256, 256))
+        break
 
 
 if __name__ == "__main__":
-    predict('wkw2wrd6', 128, 'hela')
+    predict('0aa6qqix', 16, 'pan')
 
 
 

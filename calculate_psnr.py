@@ -71,7 +71,10 @@ def predict(run_id, level, task):
 if __name__ == "__main__":
     levels = [2, 4, 8, 16, 32, 64, 128]
     tasks = ['pan']
-    strategies = ['dpc', 'learned', 'off_axis', 'all', 'random', 'center']
+    # strategies = ['dpc', 'learned', 'off_axis', 'all', 'random', 'center']
+    strategies = ['dpc', 'off_axis', 'all', 'center']
+    # strategies = ['off_axis', 'all', 'center']
+
     out_dir = os.path.join('/hddraid5/data/colin/ctc/psnrs')
     os.makedirs(out_dir, exist_ok=True)
     for task in tasks:
