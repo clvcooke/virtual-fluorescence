@@ -124,7 +124,7 @@ class Trainer:
                     wandb.log({
                         'batch_mean_max': np.mean(self.model.batch_maxs),
                         'batch_mean_min': np.mean(self.model.batch_mins)
-                    }, step=self.curr_epoch - 1)
+                    }, step=self.curr_epoch)
                     self.model.batch_maxs = []
                     self.model.batch_mins = []
 
