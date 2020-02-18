@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 
+import wandb
 from modules import IlluminationLayer, GaussianNoise
 from unet import UNet
 from classifier import Classifier
@@ -19,6 +20,8 @@ class Model(nn.Module):
         self.noise_layer = GaussianNoise(noise)
         self.hardtanh = nn.Hardtanh(-1, 1)
         self.batchnorm = nn.BatchNorm2d(num_channels)
+        self.batch_mins = []
+        self.batch_maxs = []
 
         if str(task).lower() == 'malaria':
             if skip:
@@ -50,7 +53,8 @@ class Model(nn.Module):
             illuminated_image = self.illumination_layer(x)
         if self.noise_layer.active:
             # clip the image so that noise is effective
-            print("pre max/min: ", torch.max(illuminated_image), torch.min(illuminated_image))
+            self.batch_maxs.append(torch.max(illuminated_image).cpu().detach().numpy().flatten()[0])
+            self.batch_mins.append(torch.min(illuminated_image).cpu().detach().numpy().flatten()[0])
             illuminated_image = self.hardtanh(illuminated_image)
             # adding gaussian noise, pass through if sigma is zero
             illuminated_image = self.noise_layer(illuminated_image)
@@ -65,6 +69,7 @@ class Model(nn.Module):
         # save the weights
         weight_path = os.path.join('/hddraid5/data/colin/ctc/patterns', f'epoch_{epoch}_step_{step}.npy')
         np.save(weight_path, weight)
+
 
     def save_model(self, file_path=None, verbose=False):
         # if no path given try to get path from W&B

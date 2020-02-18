@@ -118,8 +118,16 @@ class Trainer:
                 else:
                     pbar.set_description(f"{(toc - tic):.1f}s - loss: {loss_data:.3f}")
                 pbar.update(self.batch_size)
-                if training and i % 2 == 0:
-                    self.model.log_illumination(self.curr_epoch, i)
+                if training and i == len(dataset) - 1:
+                    # self.model.log_illumination(self.curr_epoch, i)
+                    # on last epoch log the batch data then clear the data
+                    wandb.log({
+                        'batch_mean_max': np.mean(self.model.batch_maxs),
+                        'batch_mean_min': np.mean(self.model.batch_mins)
+                    }, step=self.curr_epoch - 1)
+                    self.model.batch_maxs = []
+                    self.model.batch_mins = []
+
                 if not training and i == 0 and not self.classification:
                     y_sample = y[0, 0].view(256, 256).detach().cpu().numpy()
                     p_sample = output[0, 0].view(256, 256).detach().cpu().numpy()
