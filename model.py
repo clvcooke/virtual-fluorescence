@@ -3,7 +3,7 @@ import numpy as np
 import torch.nn as nn
 
 import wandb
-from modules import IlluminationLayer, GaussianNoise
+from modules import IlluminationLayer, DetectorNoise
 from unet import UNet
 from classifier import Classifier
 import wandb
@@ -11,13 +11,13 @@ import os
 
 
 class Model(nn.Module):
-    def __init__(self, num_heads, num_channels=1, batch_norm=False, skip=False, initilization_strategy=None,
+    def __init__(self, num_heads, num_leds,  num_channels=1, batch_norm=False, skip=False, initilization_strategy=None,
                  num_filters=16, task='hela', noise=0.0):
         super().__init__()
         self.num_heads = num_heads
         self.skip = skip
         self.task = task
-        self.noise_layer = GaussianNoise(noise)
+        self.noise_layer = DetectorNoise(noise)
         self.hardtanh = nn.Hardtanh(-1, 1)
         self.batchnorm = nn.BatchNorm2d(num_channels)
         self.batch_mins = []
@@ -27,20 +27,20 @@ class Model(nn.Module):
             if skip:
                 raise RuntimeError("We aren't testing this!")
             else:
-                self.illumination_layer = IlluminationLayer(96, num_channels, initilization_strategy)
+                self.illumination_layer = IlluminationLayer(num_leds, num_channels, initilization_strategy)
                 self.nets = [Classifier(2, num_channels, batch_norm=batch_norm) for _ in range(self.num_heads)]
         elif str(task).lower() == 'mnist':
             if skip:
                 raise RuntimeError("We aren't testing this!")
             else:
-                self.illumination_layer = IlluminationLayer(25, num_channels, initilization_strategy)
+                self.illumination_layer = IlluminationLayer(num_leds, num_channels, initilization_strategy)
                 self.nets = [Classifier(10, num_channels, batch_norm=batch_norm) for _ in range(self.num_heads)]
         else:
             if not skip:
-                self.illumination_layer = IlluminationLayer(675, num_channels, initilization_strategy)
+                self.illumination_layer = IlluminationLayer(num_leds, num_channels, initilization_strategy)
                 self.nets = [UNet(1, num_filters, num_channels, batch_norm=batch_norm) for _ in range(self.num_heads)]
             else:
-                self.nets = [UNet(1, num_filters, 675, batch_norm=batch_norm) for _ in range(self.num_heads)]
+                self.nets = [UNet(1, num_filters, num_leds, batch_norm=batch_norm) for _ in range(self.num_heads)]
         try:
             self.run_name = os.path.basename(wandb.run.path)
         except:
@@ -51,13 +51,12 @@ class Model(nn.Module):
             illuminated_image = x
         else:
             illuminated_image = self.illumination_layer(x)
-        if self.noise_layer.active:
-            # clip the image so that noise is effective
-            self.batch_maxs.append(torch.max(illuminated_image).cpu().detach().numpy().flatten()[0])
-            self.batch_mins.append(torch.min(illuminated_image).cpu().detach().numpy().flatten()[0])
-            illuminated_image = self.hardtanh(illuminated_image)
-            # adding gaussian noise, pass through if sigma is zero
-            illuminated_image = self.noise_layer(illuminated_image)
+        self.batch_maxs.append(torch.max(illuminated_image).cpu().detach().numpy().flatten()[0])
+        self.batch_mins.append(torch.min(illuminated_image).cpu().detach().numpy().flatten()[0])
+        # adding gaussian noise, pass through if sigma is zero
+        illuminated_image = self.noise_layer(illuminated_image)
+        # clip the image to simulate a detector
+        illuminated_image = self.hardtanh(illuminated_image)
         results = [net(illuminated_image) for net in self.nets]
         return torch.stack(results)
 

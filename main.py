@@ -17,7 +17,8 @@ def main(config):
         torch.cuda.manual_seed(config.random_seed)
     # get data-loaders
     # create a model
-    model = Model(config.num_heads, config.num_channels, batch_norm=config.batch_norm, skip=config.skip,
+    train_dataset, val_dataset, num_leds = get_train_val_loader(config, pin_memory=True)
+    model = Model(config.num_heads,num_leds, config.num_channels, batch_norm=config.batch_norm, skip=config.skip,
                   initilization_strategy=config.init_strategy, num_filters=config.num_filters, task=config.task,
                   noise=config.noise)
     if config.use_gpu:
@@ -30,7 +31,6 @@ def main(config):
     # setup optimizer
     optimizer = torch.optim.Adam(params, lr=config.init_lr)
 
-    train_dataset, val_dataset = get_train_val_loader(config, pin_memory=True)
 
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
     wandb.config.update(config)
