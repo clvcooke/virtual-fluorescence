@@ -19,7 +19,7 @@ class Model(nn.Module):
         self.task = task
         self.noise_layer = DetectorNoise(noise)
         self.hardtanh = nn.Hardtanh(-1, 1)
-        self.batchnorm = nn.BatchNorm2d(num_channels)
+        # self.batchnorm = nn.BatchNorm2d(num_channels)
         self.batch_mins = []
         self.batch_maxs = []
 

@@ -14,7 +14,10 @@ class Trainer:
         self.val_loader = validation_dataset
         self.config = config
         self.batch_size = self.config.batch_size
-#        self.criterion = torch.nn.L1Loss()
+        if config.l1_penalty > 0.0:
+            self.l1_regularization = config.l1_penalty
+        else:
+            self.l1_regularization = None
         task = str(config.task).lower()
         if task == 'mnist' or task == 'malaria':
             self.criterion = torch.nn.CrossEntropyLoss()
@@ -98,6 +101,9 @@ class Trainer:
                         loss = loss + self.criterion(output[head], y[head])
                 loss = loss / self.model.num_heads
                 if training:
+                    if self.l1_regularization is not None:
+                        for param in self.model.illumination_layer.parameters():
+                            loss += torch.norm(param)*self.l1_regularization
                     loss.backward()
                     self.optimizer.step()
                 try:

@@ -18,7 +18,7 @@ def main(config):
     # get data-loaders
     # create a model
     train_dataset, val_dataset, num_leds = get_train_val_loader(config, pin_memory=True)
-    model = Model(config.num_heads,num_leds, config.num_channels, batch_norm=config.batch_norm, skip=config.skip,
+    model = Model(config.num_heads, num_leds, config.num_channels, batch_norm=config.batch_norm, skip=config.skip,
                   initilization_strategy=config.init_strategy, num_filters=config.num_filters, task=config.task,
                   noise=config.noise)
     if config.use_gpu:
@@ -30,7 +30,6 @@ def main(config):
         params += list(net.parameters())
     # setup optimizer
     optimizer = torch.optim.Adam(params, lr=config.init_lr)
-
 
     trainer = Trainer(model, optimizer, train_dataset, val_dataset, config)
     wandb.config.update(config)

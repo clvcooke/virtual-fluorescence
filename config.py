@@ -54,6 +54,8 @@ misc_arg.add_argument('--init_strategy', type=str, default=None,
                       help='initialization strategy for physical layer')
 misc_arg.add_argument('--num_filters', type=int, default=16,
                       help="number of starting filters in U-net")
+misc_arg.add_argument('--l1_penalty', type=float, default=0.0,
+                      help='weight on l1 loss')
 
 # variance control
 misc_arg.add_argument('--shift', type=str, default="", help="shifting of the LED pattern")
