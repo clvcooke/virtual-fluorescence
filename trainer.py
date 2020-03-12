@@ -100,17 +100,20 @@ class Trainer:
                     else:
                         loss = loss + self.criterion(output[head], y[head])
                 loss = loss / self.model.num_heads
+                mse_loss = loss.detach()
+                try:
+                    loss_data = mse_loss.data[0]
+                except IndexError:
+                    loss_data = mse_loss.data.item()
+                losses.update(loss_data)
+
                 if training:
                     if self.l1_regularization is not None:
                         for param in self.model.illumination_layer.parameters():
                             loss += torch.norm(param)*self.l1_regularization
                     loss.backward()
                     self.optimizer.step()
-                try:
-                    loss_data = loss.data[0]
-                except IndexError:
-                    loss_data = loss.data.item()
-                losses.update(loss_data)
+
                 # measure elapsed time
                 toc = time.time()
                 batch_time.update(toc - tic)
