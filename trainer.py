@@ -14,7 +14,10 @@ class Trainer:
         self.val_loader = validation_dataset
         self.config = config
         self.batch_size = self.config.batch_size
-#        self.criterion = torch.nn.L1Loss()
+        if config.l1_penalty > 0.0:
+            self.l1_regularization = config.l1_penalty
+        else:
+            self.l1_regularization = None
         task = str(config.task).lower()
         if task == 'mnist' or task == 'malaria':
             self.criterion = torch.nn.CrossEntropyLoss()
@@ -97,14 +100,18 @@ class Trainer:
                     else:
                         loss = loss + self.criterion(output[head], y[head])
                 loss = loss / self.model.num_heads
+                mse_loss = loss.detach()
+                try:
+                    loss_data = mse_loss.data[0]
+                except IndexError:
+                    loss_data = mse_loss.data.item()
+                losses.update(loss_data)
                 if training:
+                    if self.l1_regularization is not None:
+                        for param in self.model.illumination_layer.parameters():
+                            loss += torch.norm(param)*self.l1_regularization
                     loss.backward()
                     self.optimizer.step()
-                try:
-                    loss_data = loss.data[0]
-                except IndexError:
-                    loss_data = loss.data.item()
-                losses.update(loss_data)
                 # measure elapsed time
                 toc = time.time()
                 batch_time.update(toc - tic)
@@ -118,8 +125,16 @@ class Trainer:
                 else:
                     pbar.set_description(f"{(toc - tic):.1f}s - loss: {loss_data:.3f}")
                 pbar.update(self.batch_size)
-                if training and i % 2 == 0:
-                    self.model.log_illumination(self.curr_epoch, i)
+                if training and i == len(dataset) - 1:
+                    # self.model.log_illumination(self.curr_epoch, i)
+                    # on last epoch log the batch data then clear the data
+                    wandb.log({
+                        'batch_mean_max': np.mean(self.model.batch_maxs),
+                        'batch_mean_min': np.mean(self.model.batch_mins)
+                    }, step=self.curr_epoch)
+                    self.model.batch_maxs = []
+                    self.model.batch_mins = []
+
                 if not training and i == 0 and not self.classification:
                     y_sample = y[0, 0].view(256, 256).detach().cpu().numpy()
                     p_sample = output[0, 0].view(256, 256).detach().cpu().numpy()

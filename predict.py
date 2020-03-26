@@ -9,7 +9,7 @@ from tqdm import tqdm
 def predict(run_id, level, task):
     model_path = f'/hddraid5/data/colin/ctc/models/model_{run_id}.pth'
     unet_path = f'/hddraid5/data/colin/ctc/models/net_0_{run_id}.pth'
-    model = Model(num_heads=1, batch_norm=True)
+    model = Model(num_heads=1, batch_norm=True, num_leds=675)
     model_state = torch.load(model_path)
     unet_state = torch.load(unet_path)
     model.load_state_dict(model_state)
@@ -41,7 +41,7 @@ def predict(run_id, level, task):
 
 
 if __name__ == "__main__":
-    predict('0aa6qqix', 16, 'pan')
+    predict('60kb2zb0', 128 , 'pan')
 
 
 
