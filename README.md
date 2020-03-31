@@ -1,5 +1,2 @@
-# Convergence through Collaboration
+# Physics-enhanced machine learning for virtual fluorescence microscopy
 
-How can we reduce the coupling of physical layers and deep neural networks? Do it collaborively :)
-
-More to come...
